@@ -19,7 +19,7 @@ public class DBContext : DbContext
     
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Database=PlantDB;Username=vinicius;Password=admin; IncludeErrorDetail = true");
+        optionsBuilder.UseNpgsql("Host=localhost;Database=PlantDB;Username=postgres;Password=admin; IncludeErrorDetail = true");
     }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
