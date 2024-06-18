@@ -13,7 +13,7 @@ public class DBContext : DbContext
 
     static DBContext()
     {
-        NpgsqlConnection.GlobalTypeMapper.MapEnum<carelevel>();
+        NpgsqlConnection.GlobalTypeMapper.MapEnum<Care_Level>();
         NpgsqlConnection.GlobalTypeMapper.MapEnum<Growth_Rate>();
     }
     
@@ -24,7 +24,7 @@ public class DBContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasPostgresEnum<carelevel>();
+        modelBuilder.HasPostgresEnum<Care_Level>();
         modelBuilder.HasPostgresEnum<Growth_Rate>();
         
         modelBuilder.Entity<PlantSummary>()

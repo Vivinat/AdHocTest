@@ -12,13 +12,13 @@ class Program
             var report = new AdHocReport(dbContext);
 
             // Query de teste: buscando na tabela plant e plantdetails com 3 atributos
-            var query = "plant:plantdetails:edible_fruit=true;growth_rate=high;indoor=true";
+            var query = "plant:plantdangerous:care_level=moderate;poisonous_to_pets=true";
             var result = await report.GenerateReportAsync(query);
 
             // Imprimindo os resultados
             foreach (var item in result)
             {
-                Console.WriteLine($"Plant: {item.Plant.scientific_name}, Edible Fruit: {item.Related.edible_fruit}, Growth Rate: {item.Related.growth_rate}, Indoor: {item.Related.indoor}");
+                Console.WriteLine($"Plant: {item.Plant.scientific_name}, Care Level: {item.Related.care_level}, Poisonous: {item.Related.poisonous_to_pets}");
             }
         }
     }

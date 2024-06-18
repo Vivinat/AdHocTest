@@ -23,30 +23,78 @@ public class AdHocReport
 
         IQueryable<dynamic> queryable = null;
 
-        switch (relatedTable.ToLower())
+        switch (mainTable.ToLower())
         {
-            case "plantdetails":
-                queryable = _context.plant
-                    .Join(_context.plant_details,
-                        plant => plant.scientific_name,
-                        detail => detail.scientific_name,
-                        (plant, detail) => new { Plant = plant, Related = detail });
+            case "plant":
+                switch (relatedTable.ToLower())
+                {
+                    case "plantdetails":
+                        queryable = _context.plant
+                            .Join(_context.plant_details,
+                                plant => plant.scientific_name,
+                                detail => detail.scientific_name,
+                                (plant, detail) => new { Plant = plant, Related = detail });
+                        break;
+                    case "plantdangerous":
+                        queryable = _context.plant
+                            .Join(_context.dangerous_plants,
+                                plant => plant.scientific_name,
+                                danger => danger.scientific_name,
+                                (plant, danger) => new { Plant = plant, Related = danger });
+                        break;
+                    case "cultivation":
+                        queryable = _context.plant
+                            .Join(_context.cultivation,
+                                plant => plant.scientific_name,
+                                cultivation => cultivation.scientific_name,
+                                (plant, cultivation) => new { Plant = plant, Related = cultivation });
+                        break;
+                    // Adicione outras tabelas relacionadas conforme necessário
+                }
                 break;
             case "plantdangerous":
-                queryable = _context.plant
-                    .Join(_context.dangerous_plants,
-                        plant => plant.scientific_name,
-                        danger => danger.scientific_name,
-                        (plant, danger) => new { Plant = plant, Related = danger });
+                switch (relatedTable.ToLower())
+                {
+                    case "plant":
+                        queryable = _context.dangerous_plants
+                            .Join(_context.plant,
+                                danger => danger.scientific_name,
+                                plant => plant.scientific_name,
+                                (danger, plant) => new { Plant = plant, Related = danger });
+                        break;
+                    // Adicione outras tabelas relacionadas conforme necessário
+                }
                 break;
+            
             case "cultivation":
-                queryable = _context.plant
-                    .Join(_context.cultivation,
-                        plant => plant.scientific_name,
-                        cultivation => cultivation.scientific_name,
-                        (plant, cultivation) => new { Plant = plant, Related = cultivation });
+                switch (relatedTable.ToLower())
+                {
+                    case "plant":
+                        queryable = _context.cultivation
+                            .Join(_context.plant,
+                                cult => cult.scientific_name,
+                                plant => plant.scientific_name,
+                                (cult, plant) => new { Plant = plant, Related = cult });
+                        break;
+                    // Adicione outras tabelas relacionadas conforme necessário
+                }
                 break;
-            // Adicione outras tabelas relacionadas conforme necessário
+            
+            case "plantdetails":
+                switch (relatedTable.ToLower())
+                {
+                    case "plant":
+                        queryable = _context.plant_details
+                            .Join(_context.plant,
+                                details => details.scientific_name,
+                                plant => plant.scientific_name,
+                                (details, plant) => new { Plant = plant, Related = details });
+                        break;
+                    // Adicione outras tabelas relacionadas conforme necessário
+                }
+                break;
+            
+            // Adicione outros casos para outras tabelas principais
         }
 
         var whereClauses = new List<string>();
@@ -57,10 +105,30 @@ public class AdHocReport
             var p = parameters[i];
             var key = p.Split('=')[0];
             var value = p.Split('=')[1];
-            whereClauses.Add($"Related.{key} == @{i}");
+            
+            var plantType = queryable.ElementType.GetProperty("Plant").PropertyType;
+            var relatedType = queryable.ElementType.GetProperty("Related").PropertyType;
+            
+            if (plantType.GetProperty(key) != null)
+            {
+                whereClauses.Add($"Plant.{key} == @{i}");
+            }
+            else if (relatedType.GetProperty(key) != null)
+            {
+                whereClauses.Add($"Related.{key} == @{i}");
+            }
+            else
+            {
+                throw new Exception($"Property {key} not found in either {mainTable} or {relatedTable}");
+            }
+            
             if (key.Equals("growth_rate", StringComparison.OrdinalIgnoreCase))
             {
                 values.Add(Enum.Parse(typeof(Growth_Rate), value, true));
+            }
+            else if (key.Equals("care_level", StringComparison.OrdinalIgnoreCase))
+            {
+                values.Add(Enum.Parse(typeof(Care_Level), value, true));
             }
             else
             {
@@ -74,24 +142,6 @@ public class AdHocReport
         queryable = queryable.Where(whereClause, values.ToArray());
 
         return await queryable.ToDynamicListAsync();
-    }
-
-    private object ConvertParameter(string key, string value)
-    {
-        // Adapte este método para incluir todas as suas propriedades enum
-        if (key.Equals("growthrate", StringComparison.OrdinalIgnoreCase))
-        {
-            return Enum.Parse(typeof(Growth_Rate), value.ToLower(), true);
-        }
-
-        if (key.Equals("carelevel", StringComparison.OrdinalIgnoreCase))
-        {
-            return Enum.Parse(typeof(carelevel), value.ToLower(), true);
-        }
-
-        // Adicione outros enums ou tipos de conversão conforme necessário
-
-        return value; // Retorne o valor como string para outros tipos
     }
 }
 
