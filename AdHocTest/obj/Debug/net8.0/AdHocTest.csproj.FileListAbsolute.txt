@@ -29,3 +29,4 @@
 /home/vinicius/RiderProjects/AdHocTest/AdHocTest/obj/Debug/net8.0/AdHocTest.pdb
 /home/vinicius/RiderProjects/AdHocTest/AdHocTest/obj/Debug/net8.0/AdHocTest.genruntimeconfig.cache
 /home/vinicius/RiderProjects/AdHocTest/AdHocTest/obj/Debug/net8.0/ref/AdHocTest.dll
+/home/vinicius/RiderProjects/AdHocTest/AdHocTest/obj/Debug/net8.0/AdHocTest.sourcelink.json
