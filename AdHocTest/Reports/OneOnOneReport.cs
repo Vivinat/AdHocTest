@@ -6,29 +6,30 @@ using AdHocTest.Types;
 
 namespace AdHocTest.Reports;
 
-public class AdHocReport
+public class OneOnOneReport
 {
     private readonly DBContext _context;
 
-    public AdHocReport(DBContext context)   //Injeção de dependencia para DBContext
+    public OneOnOneReport(DBContext context)   //Injeção de dependencia para DBContext
     {
         _context = context;
     }
+
     public async Task<List<dynamic>> GenerateReportAsync(string query)
     {
-        var parts = query.Split(':');     //Divisao da query de entrada 
-        var mainTable = parts[0];          //Primeiro termo é a main table
-        var relatedTable = parts[1];        //Segundo, a related table
-        var parameters = parts[2].Split(';');   //restante, parametros
+        var parts = query.Split(':'); //Divisao da query de entrada 
+        var mainTable = parts[0]; //Primeiro termo é a main table
+        var relatedTable = parts[1]; //Segundo, a related table
+        var parameters = parts[2].Split(';'); //restante, parametros
 
         IQueryable<dynamic> queryable = null;
 
-        switch (mainTable.ToLower())            //Qual é a main table?
+        switch (mainTable.ToLower()) //Qual é a main table?
         {
             case "plant":
-                switch (relatedTable.ToLower())     //Qual a related?
+                switch (relatedTable.ToLower()) //Qual a related?
                 {
-                    case "plantdetails":            //Faz o join apenas com aquela tabela
+                    case "plantdetails": //Faz o join apenas com aquela tabela
                         queryable = _context.plant
                             .Join(_context.plant_details,
                                 plant => plant.scientific_name,
@@ -50,6 +51,7 @@ public class AdHocReport
                                 (plant, cultivation) => new { Plant = plant, Related = cultivation });
                         break;
                 }
+
                 break;
             case "plantdangerous":
                 switch (relatedTable.ToLower())
@@ -62,8 +64,9 @@ public class AdHocReport
                                 (danger, plant) => new { Plant = plant, Related = danger });
                         break;
                 }
+
                 break;
-            
+
             case "cultivation":
                 switch (relatedTable.ToLower())
                 {
@@ -75,8 +78,9 @@ public class AdHocReport
                                 (cult, plant) => new { Plant = plant, Related = cult });
                         break;
                 }
+
                 break;
-            
+
             case "plantdetails":
                 switch (relatedTable.ToLower())
                 {
@@ -88,24 +92,38 @@ public class AdHocReport
                                 (details, plant) => new { Plant = plant, Related = details });
                         break;
                 }
+
                 break;
         }
 
-        var whereClauses = new List<string>();  //Aqui os parametros são processados
-        var predicate = "true";  // Initializing the predicate with a true condition
+        var predicate = "true"; // Initializing the predicate with a true condition
         var values = new List<object>();
-        
+        bool hasScientificName = false;
+        bool hasCommonName = false;
 
-        for (int i = 0; i < parameters.Length; i++)     //Parametros são quebrados para iniciar a filtragem
+
+        if (parameters.Contains("@scientific_name"))
+        {
+            hasScientificName = true;
+            parameters = parameters.Where(p => !p.StartsWith("@scientific_name")).ToArray();
+        }
+
+        if (parameters.Contains("@common_name"))
+        {
+            hasCommonName = true;
+            parameters = parameters.Where(p => !p.StartsWith("@common_name")).ToArray();
+        }
+
+        for (int i = 0; i < parameters.Length; i++) //Parametros são quebrados para iniciar a filtragem
         {
             var p = parameters[i];
             var key = p.Split('=')[0];
             var value = p.Split('=')[1];
-            
-            var plantType = queryable.ElementType.GetProperty("Plant").PropertyType;        //MAIN TABLE  
-            var relatedType = queryable.ElementType.GetProperty("Related").PropertyType;    //RELATED TABLE
-            
-            if (plantType.GetProperty(key) != null)     //O que estou tentando filtrar está aonde?
+
+            var plantType = queryable.ElementType.GetProperty("Plant").PropertyType; //MAIN TABLE  
+            var relatedType = queryable.ElementType.GetProperty("Related").PropertyType; //RELATED TABLE
+
+            if (plantType.GetProperty(key) != null) //O que estou tentando filtrar está aonde?
             {
                 predicate += $" AND Plant.{key} == @{i}";
             }
@@ -115,12 +133,13 @@ public class AdHocReport
             }
             else
             {
-                throw new Exception($"Property {key} not found in either {mainTable} or {relatedTable}");   //NAO ENCONTREI
+                throw new Exception(
+                    $"Property {key} not found in either {mainTable} or {relatedTable}"); //NAO ENCONTREI
             }
-            
-            if (key.Equals("growth_rate", StringComparison.OrdinalIgnoreCase))  //O QUE EU ACHEI É UM ENUM?
+
+            if (key.Equals("growth_rate", StringComparison.OrdinalIgnoreCase)) //O QUE EU ACHEI É UM ENUM?
             {
-                values.Add(Enum.Parse(typeof(Growth_Rate), value, true));   //SE SIM, TEMOS QUE CONVERTELO
+                values.Add(Enum.Parse(typeof(Growth_Rate), value, true)); //SE SIM, TEMOS QUE CONVERTELO
             }
             else if (key.Equals("care_level", StringComparison.OrdinalIgnoreCase))
             {
@@ -128,19 +147,39 @@ public class AdHocReport
             }
             else
             {
-                values.Add(value);  //ADICIONA O FILTRO PARA A STRING DE BUSCA
+                values.Add(value); //ADICIONA O FILTRO PARA A STRING DE BUSCA
             }
+
         }
 
-        var whereClause = string.Join(" AND ", whereClauses);       //UNE OS FILTROS COM AND
-        
         queryable = queryable.Where(predicate, values.ToArray()); //APLICAÇAO DE CLAUSULA WHERE DINAMICA
 
         var requestedFields = parameters.Select(p => p.Split('=')[0]).ToList(); //ADICIONA CAMPOS PARA IMPRESSAO
-        requestedFields.Insert(0, "scientific_name");
-        requestedFields.Insert(1, "common_name");
-        
-        var resultList = new List<dynamic>();   //LISTA DINAMICA COM OS CAMPOS REQUISITADOS
+        if (hasScientificName)
+        {
+            if (requestedFields.Count == 0)
+            {
+                requestedFields.Add("scientific_name");
+            }
+            else
+            {
+                requestedFields.Insert(0, "scientific_name");
+            }
+        }
+        if (hasCommonName)
+        {
+            if (requestedFields.Count == 0)
+            {
+                requestedFields.Add("common_name");
+            }
+            else
+            {
+                requestedFields.Insert(0, "common_name");
+            }
+        }
+    
+
+    var resultList = new List<dynamic>();   //LISTA DINAMICA COM OS CAMPOS REQUISITADOS
 
         var queryResults = await queryable.ToListAsync();
 

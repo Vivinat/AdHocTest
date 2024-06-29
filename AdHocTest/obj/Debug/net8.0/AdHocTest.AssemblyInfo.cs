@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AdHocTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e724d13695ed4602597b10155f1ecc50985d6bf0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dffc3ea6a5ccfe0c0eef9ae13e6b15f55a528435")]
 [assembly: System.Reflection.AssemblyProductAttribute("AdHocTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AdHocTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

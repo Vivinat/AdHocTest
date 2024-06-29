@@ -9,20 +9,48 @@ class Program
     {
         using (var dbContext = new DBContext())     //Tenho uma batch de 30 plantas ao final do loop
         {
-            var report = new AdHocReport(dbContext);
-
+            var oneOnOneReport = new OneOnOneReport(dbContext);
+            var oneReport = new OneReport(dbContext);
+            var twoReport = new TwoOnOneReport(dbContext);
+            
             // Query de teste: buscando na tabela plant e plantdetails com 3 atributos
-            var query = "cultivation:plant:watering=Frequent;sunlight=full sun";
-            var result = await report.GenerateReportAsync(query);
-
-            // Imprimindo os resultados
-            foreach (var item in result)
+            var query = "2plant:cultivation:plantdetails:@scientific_name;@common_name;watering=average;growth_rate=low";
+            object result = null;
+            
+            if (query.StartsWith("1"))
             {
-                foreach (var key in (IDictionary<string, object>)item)
+                query = query.Substring(1);
+                result = await oneOnOneReport.GenerateReportAsync(query);    
+            }
+            else if (query.StartsWith("0"))
+            {
+                query = query.Substring(1);
+                result = await oneReport.GenerateReportAsync(query);    
+            }
+            else if (query.StartsWith("2"))
+            {
+                query = query.Substring(1);
+                result = await twoReport.GenerateReportAsync(query);
+            }
+            else if (query.StartsWith("3"))
+            {
+                query = query.Substring(1);
+                
+            }
+
+            if (result != null) // Check if result is not null before iterating
+            {
+                int index = 0;
+                foreach (var item in (IEnumerable<object>)result)
                 {
-                    Console.WriteLine($"{key.Key}: {key.Value}");
+                    index++;
+                    foreach (var key in (IDictionary<string, object>)item)
+                    {
+                        Console.WriteLine($"{key.Key}: {key.Value}");
+                    }
+                    Console.WriteLine();
                 }
-                Console.WriteLine();
+                Console.WriteLine("Retornados " + index + " registros");
             }
         }
     }
