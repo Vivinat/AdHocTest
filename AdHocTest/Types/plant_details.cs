@@ -11,7 +11,7 @@ public enum Growth_Rate
     high
 }
 
-public class PlantDetailsSummary
+public class plant_details
 {
     [Key]public int id_detail{ get; set; }      //Chave primária
     public bool edible_fruit { get; set; }
@@ -21,5 +21,5 @@ public class PlantDetailsSummary
     public string scientific_name{ get; set; }
     public bool medicinal { get; set; }
     
-    public PlantSummary PlantSummary { get; set; }
+    public plant Plant { get; set; }
 }

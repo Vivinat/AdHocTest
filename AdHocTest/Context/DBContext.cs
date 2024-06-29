@@ -6,10 +6,10 @@ namespace AdHocTest.Context;
 
 public class DBContext : DbContext
 {
-    public DbSet<PlantSummary> plant { get; set; }
-    public DbSet<PlantDetailsSummary> plant_details { get; set; }
-    public DbSet<DangerousPlantsSummary> dangerous_plants { get; set; }
-    public DbSet<CultivationSummary> cultivation { get; set; }
+    public DbSet<plant> plant { get; set; }
+    public DbSet<plant_details> plant_details { get; set; }
+    public DbSet<dangerous_plants> dangerous_plants { get; set; }
+    public DbSet<cultivation> cultivation { get; set; }
 
     static DBContext()
     {
@@ -27,19 +27,19 @@ public class DBContext : DbContext
         modelBuilder.HasPostgresEnum<Care_Level>();
         modelBuilder.HasPostgresEnum<Growth_Rate>();
         
-        modelBuilder.Entity<PlantSummary>()
+        modelBuilder.Entity<plant>()
             .HasMany(p => p.PlantDetails)
-            .WithOne(pd => pd.PlantSummary)
+            .WithOne(pd => pd.Plant)
             .HasForeignKey(pd => pd.scientific_name);
 
-        modelBuilder.Entity<PlantSummary>()
+        modelBuilder.Entity<plant>()
             .HasMany(p => p.PlantDangerous)
-            .WithOne(pd => pd.PlantSummary)
+            .WithOne(pd => pd.Plant)
             .HasForeignKey(pd => pd.scientific_name);
 
-        modelBuilder.Entity<PlantSummary>()
+        modelBuilder.Entity<plant>()
             .HasMany(p => p.Cultivations)
-            .WithOne(pd => pd.PlantSummary)
+            .WithOne(pd => pd.Plant)
             .HasForeignKey(pd => pd.scientific_name);
     }
 }

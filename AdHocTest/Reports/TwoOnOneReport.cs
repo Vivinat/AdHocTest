@@ -43,15 +43,15 @@ public class TwoOnOneReport
         Type related3Type;
         if (relatedTable2 == "plantdangerous")
         {
-            related3Type = typeof(DangerousPlantsSummary);
+            related3Type = typeof(dangerous_plants);
         }
         else if (relatedTable2 == "plantdetails")
         {
-            related3Type = typeof(PlantDetailsSummary);
+            related3Type = typeof(plant_details);
         }
         else
         {
-            related3Type = typeof(CultivationSummary);
+            related3Type = typeof(cultivation);
         }
 
         var queryable = _context.plant
@@ -82,22 +82,38 @@ public class TwoOnOneReport
             var key = parameter.Split('=')[0];
             var value = parameter.Split('=')[1];
 
-            var prop = mainType.GetProperty(key) ?? relatedType1.GetProperty(key) ?? relatedType2.GetProperty(key);
-            if (prop != null)
+            var prop = mainType.GetProperty(key)?? relatedType1.GetProperty(key)?? relatedType2.GetProperty(key)?? related3Type.GetProperty(key);
+            if (prop!= null)
             {
                 if (!string.IsNullOrEmpty(predicate))
                 {
                     predicate += " AND ";
                 }
-                predicate += $"{prop.DeclaringType.Name}.{key} == @{values.Count}";
+                if (prop.DeclaringType == mainType)
+                {
+                    predicate += $"{mainType.Name}.{key} == @{values.Count}";
+                }
+                else if (prop.DeclaringType == relatedType1)
+                {
+                    predicate += $"{relatedType1.Name}.{key} == @{values.Count}";
+                }
+                else if (prop.DeclaringType == relatedType2)
+                {
+                    predicate += $"{relatedType2.Name}.{key} == @{values.Count}";
+                }
+                else if (prop.DeclaringType == related3Type)
+                {
+                    predicate += $"{related3Type.Name}.{key} == @{values.Count}";
+                }
             }
             else
             {
-                throw new Exception($"Property {key} not found in {mainTable}, {relatedTable1}, or {relatedTable2}");
+                throw new Exception($"Property {key} not found in {mainTable}, {relatedTable1}, {relatedTable2}");
             }
 
             values.Add(value);
         }
+        
 
         queryable = queryable.Where(predicate, values.ToArray());
 
