@@ -1,59 +1,80 @@
 ﻿using AdHocTest.Context;
 using AdHocTest.Reports;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-namespace AdHocTest;
-
-class Program
+namespace AdHocTest
 {
-    public static async Task Main(string[] args)
+    class Program
     {
-        using (var dbContext = new DBContext())     //Tenho uma batch de 30 plantas ao final do loop
+        public static void Main(string[] args)
         {
-            var oneOnOneReport = new OneOnOneReport(dbContext);
-            var oneReport = new OneReport(dbContext);
-            var twoReport = new TwoOnOneReport(dbContext);
-            var threeReport = new ThreeOnOneReport(dbContext);
-            
-            // Query de teste: buscando na tabela plant e plantdetails com 3 atributos
-            var query = "3plant:cultivation:plantdetails:plantdangerous:@scientific_name;@common_name;watering=Average;growth_rate=high;poisonous_to_pets=true";
-            object result = null;
-            
-            if (query.StartsWith("1"))
-            {
-                query = query.Substring(1);
-                result = await oneOnOneReport.GenerateReportAsync(query);    
-            }
-            else if (query.StartsWith("0"))
-            {
-                query = query.Substring(1);
-                result = await oneReport.GenerateReportAsync(query);    
-            }
-            else if (query.StartsWith("2"))
-            {
-                query = query.Substring(1);
-                result = await twoReport.GenerateReportAsync(query);
-            }
-            else if (query.StartsWith("3"))
-            {
-                query = query.Substring(1);
-                result = await threeReport.GenerateReportAsync(query);
+            var builder = WebApplication.CreateBuilder(args);
 
-            }
-
-            if (result != null) // Check if result is not null before iterating
+            // Adiciona serviços ao contêiner.
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddSpaStaticFiles(configuration =>
             {
-                int index = 0;
-                foreach (var item in (IEnumerable<object>)result)
-                {
-                    index++;
-                    foreach (var key in (IDictionary<string, object>)item)
+                configuration.RootPath = "ClientApp/dist";
+            });
+
+            builder.Services.AddDbContext<DBContext>(); // Adicione o DBContext
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
                     {
-                        Console.WriteLine($"{key.Key}: {key.Value}");
-                    }
-                    Console.WriteLine();
-                }
-                Console.WriteLine("Retornados " + index + " registros");
+                        builder.AllowAnyOrigin()
+                               .AllowAnyHeader()
+                               .AllowAnyMethod();
+                    });
+            });
+
+            // Adiciona o logger para AdHocReport
+            builder.Services.AddLogging();
+
+            var app = builder.Build();
+
+            // Configura o pipeline de requisição HTTP.
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
             }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
+
+            app.UseRouting();
+
+            app.UseCors("AllowAllOrigins"); // Use a política CORS
+
+            app.UseAuthorization();
+
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapControllers(); // Adicione isso para mapear os controladores
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+
+                if (app.Environment.IsDevelopment())
+                {
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                }
+                else
+                {
+                    spa.Options.SourcePath = "dist";
+                }
+            });
+
+            app.Run();
         }
     }
 }
