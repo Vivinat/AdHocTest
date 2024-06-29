@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AdHocTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a0fea4c6693e558c086626c715bfa90a33b44dd4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ac430335e167566b8540a959dc79d775b3dbdc60")]
 [assembly: System.Reflection.AssemblyProductAttribute("AdHocTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AdHocTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -13,7 +13,6 @@ namespace AdHocTest.Controllers
     {
         private readonly DBContext _dbContext;
         private readonly ILogger<PlantsController> _logger;
-        private readonly ILogger<AdHocReport> _adhocReportLogger;
         private readonly OneOnOneReport _oneOnOneReport;
         private readonly OneReport _oneReport;
         private readonly TwoOnOneReport _twoOnOneReport;
@@ -22,7 +21,6 @@ namespace AdHocTest.Controllers
         public PlantsController(
             DBContext dbContext,
             ILogger<PlantsController> logger,
-            ILogger<AdHocReport> adhocReportLogger,
             OneOnOneReport oneOnOneReport,
             OneReport oneReport,
             TwoOnOneReport twoOnOneReport,
@@ -30,7 +28,6 @@ namespace AdHocTest.Controllers
         {
             _dbContext = dbContext;
             _logger = logger;
-            _adhocReportLogger = adhocReportLogger;
             _oneOnOneReport = oneOnOneReport;
             _oneReport = oneReport;
             _twoOnOneReport = twoOnOneReport;
@@ -69,11 +66,6 @@ namespace AdHocTest.Controllers
                 {
                     decodedQuery = decodedQuery.Substring(1);
                     result = await _threeOnOneReport.GenerateReportAsync(decodedQuery);
-                }
-                else
-                {
-                    var report = new AdHocReport(_dbContext, _adhocReportLogger);
-                    result = await report.GenerateReportAsync(decodedQuery);
                 }
 
                 _logger.LogInformation("Generated report: {Result}", result);

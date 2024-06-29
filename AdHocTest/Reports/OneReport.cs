@@ -54,6 +54,8 @@ public class OneReport
             parameters = parameters.Where(p => !p.StartsWith("@common_name")).ToArray();
         }
 
+        parameters = parameters.Where(p => !string.IsNullOrEmpty(p)).ToArray();
+
         foreach (var parameter in parameters)
         {
             var key = parameter.Split('=')[0];
@@ -80,8 +82,6 @@ public class OneReport
                 predicate += $"{key} == @{values.Count - 1}";
             }
         }
-
-        queryable = queryable.Where(predicate, values.ToArray());
 
         queryable = queryable.Where(predicate, values.ToArray());
 

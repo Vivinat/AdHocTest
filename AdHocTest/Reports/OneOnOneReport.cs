@@ -114,6 +114,7 @@ public class OneOnOneReport
             parameters = parameters.Where(p => !p.StartsWith("@common_name")).ToArray();
         }
 
+        parameters = parameters.Where(p => !string.IsNullOrEmpty(p)).ToArray();
         for (int i = 0; i < parameters.Length; i++) //Parametros são quebrados para iniciar a filtragem
         {
             var p = parameters[i];

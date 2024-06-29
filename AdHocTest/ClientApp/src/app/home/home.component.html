@@ -1,8 +1,7 @@
 <div class="home-container">
-    <div class="tables-container" style="display: flex; flex-direction: column;align-items: center; justify-content: center;">
-      <h3>Selecionar Tabelas</h3>
-      <div style="display:flex; flex-direction: row; align-items: center; justify-content: space-around; width: 80%;">
-      <button class="filterButton" (click)="toggleTable('plant')" [style.backgroundColor]="selectedTables.includes('plant') ? 'rgba(0, 255, 34, 0.178)' : ''">Plant</button>
+  <div class="tables-container" style="display: flex; flex-direction: column;align-items: center; justify-content: center;">
+    <h3>Selecionar Tabelas</h3>
+    <div style="display:flex; flex-direction: row; align-items: center; justify-content: space-around; width: 80%;">
       <button class="filterButton" (click)="toggleTable('plantdetails')" [style.backgroundColor]="selectedTables.includes('plantdetails') ? 'rgba(0, 255, 34, 0.178)' : ''">Plant_details</button>
       <button class="filterButton" (click)="toggleTable('cultivation')" [style.backgroundColor]="selectedTables.includes('cultivation') ? 'rgba(0, 255, 34, 0.178)' : ''">Cultivation</button>
       <button class="filterButton" (click)="toggleTable('plantdangerous')" [style.backgroundColor]="selectedTables.includes('plantdangerous') ? 'rgba(0, 255, 34, 0.178)' : ''">Dangerous_plants</button>
@@ -11,17 +10,34 @@
 
   <hr style="width: 100%; margin: 10px;">
 
-  <div *ngIf="selectedTables.includes('plant')" class="filter-container">
+  <div *ngIf="selectedTables.includes('plant')" class="filter-container" style="width: 60%;">
     <button class="filterButton" (click)="toggleAttribute('scientific_name')" [style.backgroundColor]="attributes.includes('scientific_name') ? 'rgba(0, 255, 34, 0.178)' : ''">Scientific Name</button>
+    <h3> ⏪ Selecione ao menos 1 ⏩ </h3>
     <button class="filterButton" (click)="toggleAttribute('common_name')" [style.backgroundColor]="attributes.includes('common_name') ? 'rgba(0, 255, 34, 0.178)' : ''">Common Name</button>
   </div>
 
   <div *ngIf="selectedTables.includes('plantdetails')" class="filter-container">
-    <button class="filterButton" (click)="switchTrueFalseEdible()" [style.backgroundColor]="edible_fruit == true ? 'rgba(0, 255, 34, 0.178)' : ''">Comestível</button>
-    <button class="filterButton" (click)="switchTrueFalseIndoor()" [style.backgroundColor]="indoor === true ? 'rgba(0, 255, 34, 0.178)' : ''">Interior</button>
-    <button class="filterButton" (click)="switchTrueFalseInvasive()" [style.backgroundColor]="invasive === true ? 'rgba(0, 255, 34, 0.178)' : ''">Invasiva</button>
-    <button class="filterButton" (click)="switchTrueFalseMedicinal()" [style.backgroundColor]="medicinal === true ? 'rgba(0, 255, 34, 0.178)' : ''">Medicinal</button>
-    <select class="filterButton" (change)="changeGrowthRate($event)">
+    <select class="filterButton" (change)="changeEdible($event)" [style.backgroundColor]="edible_fruit !== '' ? 'rgba(0, 255, 34, 0.178)' : ''">
+      <option value=''>Comestível</option>
+      <option value="true">Comestível true</option>
+      <option value="false">Comestível false</option>
+    </select>
+    <select class="filterButton" (change)="changeIndoor($event)" [style.backgroundColor]="indoor !== '' ? 'rgba(0, 255, 34, 0.178)' : ''">
+      <option value=''>Interior</option>
+      <option value="true">Interior true</option>
+      <option value="false">Interior false</option>
+    </select>
+    <select class="filterButton" (change)="changeInvasive($event)" [style.backgroundColor]="invasive !== '' ? 'rgba(0, 255, 34, 0.178)' : ''">
+      <option value=''>Invasiva</option>
+      <option value="true">Invasiva true</option>
+      <option value="false">Invasiva false</option>
+    </select>
+    <select class="filterButton" (change)="changeMedicinal($event)" [style.backgroundColor]="medicinal !== '' ? 'rgba(0, 255, 34, 0.178)' : ''">
+      <option value=''>Medicinal</option>
+      <option value="true">Medicinal true</option>
+      <option value="false">Medicinal false</option>
+    </select>
+    <select class="filterButton" (change)="changeGrowthRate($event)" [style.backgroundColor]="growth_rate !== '' ? 'rgba(0, 255, 34, 0.178)' : ''">
       <option value=''>Taxa crescimento</option>
       <option value="low">Crescimento lento</option>
       <option value="moderate">Crescimento moderado</option>
@@ -30,8 +46,12 @@
   </div>
 
   <div *ngIf="selectedTables.includes('plantdangerous')" class="filter-container" style="width: 50%;">
-    <button class="filterButton" (click)="switchTrueFalsePoisonous()" [style.backgroundColor]="poisonous_to_pets === true ? 'rgba(0, 255, 34, 0.178)' : ''">Venenosa para pets</button>
-    <select class="filterButton" (change)="changeCareLevel($event)">
+    <select class="filterButton" (change)="changePoisonous($event)" [style.backgroundColor]="poisonous_to_pets !== '' ? 'rgba(0, 255, 34, 0.178)' : ''">
+      <option value=''>Venenosa para pets</option>
+      <option value="true">Venenosa true</option>
+      <option value="false">Venenosa false</option>
+    </select>
+    <select class="filterButton" (change)="changeCareLevel($event)" [style.backgroundColor]="care_level !== '' ? 'rgba(0, 255, 34, 0.178)' : ''">
       <option value=''>Nível de cuidado</option>
       <option value="nothing">Nenhum</option>
       <option value="moderate">Moderado</option>
@@ -41,13 +61,13 @@
   </div>
 
   <div *ngIf="selectedTables.includes('cultivation')" class="filter-container" style="width: 50%;">
-    <select class="filterButton" (change)="changeSunlight($event)">
+    <select class="filterButton" (change)="changeSunlight($event)" [style.backgroundColor]="sunlight !== '' ? 'rgba(0, 255, 34, 0.178)' : ''">
       <option value=''>Luz solar</option>
       <option value="full sun">Sempre sol</option>
       <option value="part sun/part shade">Parte sol/parte sombra</option>
     </select>
 
-    <select class="filterButton" (change)="changeWatering($event)">
+    <select class="filterButton" (change)="changeWatering($event)" [style.backgroundColor]="watering !== '' ? 'rgba(0, 255, 34, 0.178)' : ''">
       <option value=''>Água</option>
       <option value="Average">Média</option>
       <option value="Frequent">Frequente</option>
