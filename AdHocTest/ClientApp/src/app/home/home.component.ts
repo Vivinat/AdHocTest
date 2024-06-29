@@ -18,10 +18,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
   care_level: string = '';
   watering: string = '';
   sunlight: string = '';
-  primaryTable: string = 'plant';
-  secondaryTable: string = 'plant_details';
+  selectedTables: string[] = [];
+  attributes: string[] = [];
   displayedColumns: string[] = ['scientific_name', 'common_name'];
   dataSource = new MatTableDataSource<any>([]);
+  isLoading: boolean = false;
   @ViewChild(MatPaginator) paginator: MatPaginator | undefined;
 
   constructor(private apiConsumer: ApiConsumerService) {}
@@ -32,6 +33,37 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator!;
+  }
+
+  toggleTable(table: string) {
+    if (this.selectedTables.includes(table)) {
+      this.selectedTables = this.selectedTables.filter((t) => t !== table);
+    } else {
+      if (this.selectedTables.length < 3) {
+        this.selectedTables.push(table);
+      }
+    }
+    this.clearFilters();
+  }
+
+  toggleAttribute(attribute: string) {
+    if (this.attributes.includes(attribute)) {
+      this.attributes = this.attributes.filter((a) => a !== attribute);
+    } else {
+      this.attributes.push(attribute);
+    }
+  }
+
+  clearFilters() {
+    this.edible_fruit = false;
+    this.indoor = false;
+    this.invasive = false;
+    this.medicinal = false;
+    this.poisonous_to_pets = false;
+    this.growth_rate = '';
+    this.care_level = '';
+    this.watering = '';
+    this.sunlight = '';
   }
 
   switchTrueFalseEdible() {
@@ -52,29 +84,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   switchTrueFalsePoisonous() {
     this.poisonous_to_pets = !this.poisonous_to_pets;
-  }
-
-  changeTable(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    this.primaryTable = target.value;
-  }
-
-  changeTableSecondary(event: Event) {
-    const target = event.target as HTMLSelectElement;
-    this.secondaryTable = target.value;
-    this.clearFilters();
-  }
-
-  clearFilters() {
-    this.edible_fruit = false;
-    this.indoor = false;
-    this.invasive = false;
-    this.medicinal = false;
-    this.poisonous_to_pets = false;
-    this.growth_rate = '';
-    this.care_level = '';
-    this.watering = '';
-    this.sunlight = '';
   }
 
   changeGrowthRate(event: Event) {
@@ -98,7 +107,18 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   search() {
-    let query = `${this.primaryTable}:${this.secondaryTable}:`;
+    this.isLoading = true;
+
+    let query = `${this.selectedTables.length - 1}${this.selectedTables.join(
+      ':'
+    )}`;
+
+    if (this.attributes.length > 0) {
+      query += `:@${this.attributes.join(',@')}`;
+    }
+
+    query += ':';
+
     if (this.edible_fruit) {
       query += 'edible_fruit=true;';
     }
@@ -135,9 +155,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
           this.displayedColumns = Object.keys(this.dataSource.data[0]);
         }
         console.log(response);
+        this.isLoading = false;
       },
       (error) => {
         console.error('There was an error!', error);
+        this.isLoading = false;
       }
     );
   }

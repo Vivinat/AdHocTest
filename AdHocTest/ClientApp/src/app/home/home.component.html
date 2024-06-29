@@ -1,74 +1,74 @@
 <div class="home-container">
-    <div class="tables-container">
-      <div style="display: flex; flex-direction: column;align-items: center; justify-content: center;">
-        <h3>Tabela primária</h3>
-        <select (change)="changeTable($event)" class="filterButton">
-          <option value="plant">Plant</option>
-        </select>
-      </div>
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
-        <h3>Tabela secundaria</h3>
-        <select class="filterButton" (change)="changeTableSecondary($event)">
-          <option value="plantdetails">Plant_details</option>
-          <option value="cultivation">Cultivation</option>
-          <option value="plantdangerous">Dangerous_plants</option>
-        </select>
-      </div>
+    <div class="tables-container" style="display: flex; flex-direction: column;align-items: center; justify-content: center;">
+      <h3>Selecionar Tabelas</h3>
+      <div style="display:flex; flex-direction: row; align-items: center; justify-content: space-around; width: 80%;">
+      <button class="filterButton" (click)="toggleTable('plant')" [style.backgroundColor]="selectedTables.includes('plant') ? 'rgba(0, 255, 34, 0.178)' : ''">Plant</button>
+      <button class="filterButton" (click)="toggleTable('plantdetails')" [style.backgroundColor]="selectedTables.includes('plantdetails') ? 'rgba(0, 255, 34, 0.178)' : ''">Plant_details</button>
+      <button class="filterButton" (click)="toggleTable('cultivation')" [style.backgroundColor]="selectedTables.includes('cultivation') ? 'rgba(0, 255, 34, 0.178)' : ''">Cultivation</button>
+      <button class="filterButton" (click)="toggleTable('plantdangerous')" [style.backgroundColor]="selectedTables.includes('plantdangerous') ? 'rgba(0, 255, 34, 0.178)' : ''">Dangerous_plants</button>
     </div>
-  
-    <hr style="width: 100%; margin: 10px;">
-  
-    <div class="filter-container" *ngIf="secondaryTable == 'plantdetails'">
-      <button class="filterButton" (click)="switchTrueFalseEdible()" [style.backgroundColor]="edible_fruit == true ? 'rgba(0, 255, 34, 0.178)' : ''">Comestível</button>
-      <button class="filterButton" (click)="switchTrueFalseIndoor()" [style.backgroundColor]="indoor === true ? 'rgba(0, 255, 34, 0.178)' : ''">Interior</button>
-      <button class="filterButton" (click)="switchTrueFalseInvasive()" [style.backgroundColor]="invasive === true ? 'rgba(0, 255, 34, 0.178)' : ''">Invasiva</button>
-      <button class="filterButton" (click)="switchTrueFalseMedicinal()" [style.backgroundColor]="medicinal === true ? 'rgba(0, 255, 34, 0.178)' : ''">Medicinal</button>
-      <select class="filterButton" (change)="changeGrowthRate($event)">
-        <option value=''>Taxa crescimento</option>
-        <option value="low">Crescimento lento</option>
-        <option value="moderate">Crescimento moderado</option>
-        <option value="high">Crescimento rápido</option>
-      </select>
-    </div>
-  
-    <div class="filter-container" *ngIf="secondaryTable == 'plantdangerous'" style="width: 50%;">
-      <button class="filterButton" (click)="switchTrueFalsePoisonous()" [style.backgroundColor]="poisonous_to_pets === true ? 'rgba(0, 255, 34, 0.178)' : ''">Venenosa para pets</button>
-      <select class="filterButton" (change)="changeCareLevel($event)">
-        <option value=''>Nível de cuidado</option>
-        <option value="nothing">Nenhum</option>
-        <option value="moderate">Moderado</option>
-        <option value="medium">Médio</option>
-        <option value="high">Alto</option>
-      </select>
-    </div>
-  
-    <div class="filter-container" *ngIf="secondaryTable == 'cultivation'" style="width: 50%;">
-      <select class="filterButton" (change)="changeSunlight($event)">
-        <option value=''>Luz solar</option>
-        <option value="full sun">Sempre sol</option>
-        <option value="part sun/part shade">Parte sol/parte sombra</option>
-      </select>
-  
-      <select class="filterButton" (change)="changeWatering($event)">
-        <option value=''>Água</option>
-        <option value="Average">Média</option>
-        <option value="Frequent">Frequente</option>
-      </select>
-    </div>
-  
-    <button class="pesquisar" (click)="search()">Pesquisar</button>
-  
-    <div class="tableContainer" *ngIf="dataSource.data.length > 0" style="max-height: 70vh; overflow: auto;">
-      <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="background: none;">
-        <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
-          <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
-          <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
-        </ng-container>
-  
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-      </table>
-      <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
-    </div>
+  </div>
+
+  <hr style="width: 100%; margin: 10px;">
+
+  <div *ngIf="selectedTables.includes('plant')" class="filter-container">
+    <button class="filterButton" (click)="toggleAttribute('scientific_name')" [style.backgroundColor]="attributes.includes('scientific_name') ? 'rgba(0, 255, 34, 0.178)' : ''">Scientific Name</button>
+    <button class="filterButton" (click)="toggleAttribute('common_name')" [style.backgroundColor]="attributes.includes('common_name') ? 'rgba(0, 255, 34, 0.178)' : ''">Common Name</button>
+  </div>
+
+  <div *ngIf="selectedTables.includes('plantdetails')" class="filter-container">
+    <button class="filterButton" (click)="switchTrueFalseEdible()" [style.backgroundColor]="edible_fruit == true ? 'rgba(0, 255, 34, 0.178)' : ''">Comestível</button>
+    <button class="filterButton" (click)="switchTrueFalseIndoor()" [style.backgroundColor]="indoor === true ? 'rgba(0, 255, 34, 0.178)' : ''">Interior</button>
+    <button class="filterButton" (click)="switchTrueFalseInvasive()" [style.backgroundColor]="invasive === true ? 'rgba(0, 255, 34, 0.178)' : ''">Invasiva</button>
+    <button class="filterButton" (click)="switchTrueFalseMedicinal()" [style.backgroundColor]="medicinal === true ? 'rgba(0, 255, 34, 0.178)' : ''">Medicinal</button>
+    <select class="filterButton" (change)="changeGrowthRate($event)">
+      <option value=''>Taxa crescimento</option>
+      <option value="low">Crescimento lento</option>
+      <option value="moderate">Crescimento moderado</option>
+      <option value="high">Crescimento rápido</option>
+    </select>
+  </div>
+
+  <div *ngIf="selectedTables.includes('plantdangerous')" class="filter-container" style="width: 50%;">
+    <button class="filterButton" (click)="switchTrueFalsePoisonous()" [style.backgroundColor]="poisonous_to_pets === true ? 'rgba(0, 255, 34, 0.178)' : ''">Venenosa para pets</button>
+    <select class="filterButton" (change)="changeCareLevel($event)">
+      <option value=''>Nível de cuidado</option>
+      <option value="nothing">Nenhum</option>
+      <option value="moderate">Moderado</option>
+      <option value="medium">Médio</option>
+      <option value="high">Alto</option>
+    </select>
+  </div>
+
+  <div *ngIf="selectedTables.includes('cultivation')" class="filter-container" style="width: 50%;">
+    <select class="filterButton" (change)="changeSunlight($event)">
+      <option value=''>Luz solar</option>
+      <option value="full sun">Sempre sol</option>
+      <option value="part sun/part shade">Parte sol/parte sombra</option>
+    </select>
+
+    <select class="filterButton" (change)="changeWatering($event)">
+      <option value=''>Água</option>
+      <option value="Average">Média</option>
+      <option value="Frequent">Frequente</option>
+    </select>
+  </div>
+
+  <button class="pesquisar" (click)="search()" [disabled]="isLoading">
+    <span *ngIf="!isLoading">Pesquisar</span>
+    <span *ngIf="isLoading">Carregando...</span>
+  </button>
+
+  <div class="tableContainer" *ngIf="dataSource.data.length > 0" style="max-height: 70vh; overflow: auto;">
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8" style="background: none;">
+      <ng-container *ngFor="let column of displayedColumns" [matColumnDef]="column">
+        <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+        <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+  </div>
 </div>
-  

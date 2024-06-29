@@ -14,12 +14,27 @@ namespace AdHocTest.Controllers
         private readonly DBContext _dbContext;
         private readonly ILogger<PlantsController> _logger;
         private readonly ILogger<AdHocReport> _adhocReportLogger;
+        private readonly OneOnOneReport _oneOnOneReport;
+        private readonly OneReport _oneReport;
+        private readonly TwoOnOneReport _twoOnOneReport;
+        private readonly ThreeOnOneReport _threeOnOneReport;
 
-        public PlantsController(DBContext dbContext, ILogger<PlantsController> logger, ILogger<AdHocReport> adhocReportLogger)
+        public PlantsController(
+            DBContext dbContext,
+            ILogger<PlantsController> logger,
+            ILogger<AdHocReport> adhocReportLogger,
+            OneOnOneReport oneOnOneReport,
+            OneReport oneReport,
+            TwoOnOneReport twoOnOneReport,
+            ThreeOnOneReport threeOnOneReport)
         {
             _dbContext = dbContext;
             _logger = logger;
             _adhocReportLogger = adhocReportLogger;
+            _oneOnOneReport = oneOnOneReport;
+            _oneReport = oneReport;
+            _twoOnOneReport = twoOnOneReport;
+            _threeOnOneReport = threeOnOneReport;
         }
 
         [HttpGet]
@@ -33,8 +48,33 @@ namespace AdHocTest.Controllers
 
             try
             {
-                var report = new AdHocReport(_dbContext, _adhocReportLogger);
-                var result = await report.GenerateReportAsync(decodedQuery);
+                object result = null;
+
+                if (decodedQuery.StartsWith("1"))
+                {
+                    decodedQuery = decodedQuery.Substring(1);
+                    result = await _oneOnOneReport.GenerateReportAsync(decodedQuery);
+                }
+                else if (decodedQuery.StartsWith("0"))
+                {
+                    decodedQuery = decodedQuery.Substring(1);
+                    result = await _oneReport.GenerateReportAsync(decodedQuery);
+                }
+                else if (decodedQuery.StartsWith("2"))
+                {
+                    decodedQuery = decodedQuery.Substring(1);
+                    result = await _twoOnOneReport.GenerateReportAsync(decodedQuery);
+                }
+                else if (decodedQuery.StartsWith("3"))
+                {
+                    decodedQuery = decodedQuery.Substring(1);
+                    result = await _threeOnOneReport.GenerateReportAsync(decodedQuery);
+                }
+                else
+                {
+                    var report = new AdHocReport(_dbContext, _adhocReportLogger);
+                    result = await report.GenerateReportAsync(decodedQuery);
+                }
 
                 _logger.LogInformation("Generated report: {Result}", result);
 

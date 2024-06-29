@@ -32,7 +32,12 @@ namespace AdHocTest
                     });
             });
 
-            // Adiciona o logger para AdHocReport
+            // Adiciona os serviços de relatório
+            builder.Services.AddScoped<OneOnOneReport>();
+            builder.Services.AddScoped<OneReport>();
+            builder.Services.AddScoped<TwoOnOneReport>();
+            builder.Services.AddScoped<ThreeOnOneReport>();
+
             builder.Services.AddLogging();
 
             var app = builder.Build();
@@ -50,7 +55,7 @@ namespace AdHocTest
 
             app.UseRouting();
 
-            app.UseCors("AllowAllOrigins"); // Use a política CORS
+            app.UseCors("AllowAllOrigins");
 
             app.UseAuthorization();
 
@@ -58,7 +63,7 @@ namespace AdHocTest
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            app.MapControllers(); // Adicione isso para mapear os controladores
+            app.MapControllers();
 
             app.UseSpa(spa =>
             {

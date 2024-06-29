@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\vinic\\Desktop\\bdplants\\AdHocTest\\AdHocTest\\AdHocTest.csproj": {}
+    "C:\\Users\\vinic\\Desktop\\AdHocTest\\AdHocTest\\AdHocTest.csproj": {}
   },
   "projects": {
-    "C:\\Users\\vinic\\Desktop\\bdplants\\AdHocTest\\AdHocTest\\AdHocTest.csproj": {
+    "C:\\Users\\vinic\\Desktop\\AdHocTest\\AdHocTest\\AdHocTest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\vinic\\Desktop\\bdplants\\AdHocTest\\AdHocTest\\AdHocTest.csproj",
+        "projectUniqueName": "C:\\Users\\vinic\\Desktop\\AdHocTest\\AdHocTest\\AdHocTest.csproj",
         "projectName": "AdHocTest",
-        "projectPath": "C:\\Users\\vinic\\Desktop\\bdplants\\AdHocTest\\AdHocTest\\AdHocTest.csproj",
+        "projectPath": "C:\\Users\\vinic\\Desktop\\AdHocTest\\AdHocTest\\AdHocTest.csproj",
         "packagesPath": "C:\\Users\\vinic\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\vinic\\Desktop\\bdplants\\AdHocTest\\AdHocTest\\obj\\",
+        "outputPath": "C:\\Users\\vinic\\Desktop\\AdHocTest\\AdHocTest\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\vinic\\AppData\\Roaming\\NuGet\\NuGet.Config",
