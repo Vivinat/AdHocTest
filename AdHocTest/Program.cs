@@ -15,7 +15,7 @@ class Program
             var threeReport = new ThreeOnOneReport(dbContext);
             
             // Query de teste: buscando na tabela plant e plantdetails com 3 atributos
-            var query = "3plant:cultivation:plantdetails:plantdangerous:@scientific_name;@common_name;watering=Average;growth_rate=high;poisonous_to_pets=true";
+            var query = "2plant:plantdetails:cultivation:@scientific_name;indoor=true;sunlight=full sun;";
             object result = null;
             
             if (query.StartsWith("1"))

@@ -61,6 +61,8 @@ public class ThreeOnOneReport
         {
             parameters.Remove("@common_name");
         }
+        
+        parameters = parameters.Where(p => !string.IsNullOrEmpty(p)).ToArray().ToList();
 
         foreach (var parameter in parameters)
         {
