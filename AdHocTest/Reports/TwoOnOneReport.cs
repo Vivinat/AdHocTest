@@ -16,18 +16,18 @@ namespace AdHocTest.Reports
 
         public async Task<List<IDictionary<string, object>>> GenerateReportAsync(string query)
         {
-            var parts = query.Split(':');
+            var parts = query.Split(':');   //Quebra a string
             if (parts.Length < 4)
             {
-                throw new ArgumentException("Query format is incorrect. Expected format: mainTable:relatedTable1:relatedTable2:parameters");
+                throw new ArgumentException("Formato incorreto");
             }
 
-            var mainTable = parts[0];
+            var mainTable = parts[0];       //Quais são minhas tabelas?
             var relatedTable1 = parts[1];
             var relatedTable2 = parts[2];
             var parameters = parts[3].Split(';').ToList();
 
-            IQueryable<ResultRow> queryable = _context.plant
+            IQueryable<ResultRow> queryable = _context.plant    //Join com todas
                 .Join(_context.cultivation, p => p.scientific_name, c => c.scientific_name, (p, c) => new ResultRow { Main = p, Related1 = c })
                 .Join(_context.plant_details, pc => pc.Main.scientific_name, pd => pd.scientific_name, (pc, pd) => new ResultRow { Main = pc.Main, Related1 = pc.Related1, Related2 = pd });
 
@@ -39,7 +39,7 @@ namespace AdHocTest.Reports
             bool hasScientificName = parameters.Contains("@scientific_name");
             bool hasCommonName = parameters.Contains("@common_name");
 
-            if (hasScientificName)
+            if (hasScientificName)      //Se scientific ou common forem requisitados, marca os bool como true. Nao queremos eles no where
             {
                 parameters.Remove("@scientific_name");
             }
@@ -51,7 +51,7 @@ namespace AdHocTest.Reports
 
             parameters = parameters.Where(p => !string.IsNullOrEmpty(p)).ToList();
 
-            foreach (var parameter in parameters)
+            foreach (var parameter in parameters)       //Tratamento de parametros
             {
                 var keyValue = parameter.Split('=');
                 if (keyValue.Length != 2)
@@ -62,13 +62,13 @@ namespace AdHocTest.Reports
                 var key = keyValue[0];
                 var value = keyValue[1];
 
-                var mainProp = typeof(PlantSummary).GetProperty(key);
+                var mainProp = typeof(PlantSummary).GetProperty(key);       //Usa reflection para obter a qual classe pertence aquele parametro
                 var related1Prop = typeof(CultivationSummary).GetProperty(key);
                 var related2Prop = typeof(PlantDetailsSummary).GetProperty(key);
 
                 if (mainProp != null)
                 {
-                    predicate += $" AND Main.{key} == @{values.Count}";
+                    predicate += $" AND Main.{key} == @{values.Count}"; //Insere no predicado
                 }
                 else if (related1Prop != null)
                 {
@@ -83,7 +83,7 @@ namespace AdHocTest.Reports
                     throw new Exception($"Property {key} not found in {mainTable}, {relatedTable1}, or {relatedTable2}");
                 }
 
-                if (key.Equals("growth_rate", StringComparison.OrdinalIgnoreCase))
+                if (key.Equals("growth_rate", StringComparison.OrdinalIgnoreCase))      //Tratamento de enums
                 {
                     values.Add(Enum.Parse(typeof(Growth_Rate), value, true));
                 }
@@ -115,7 +115,7 @@ namespace AdHocTest.Reports
 
             var finalResultList = new List<IDictionary<string, object>>();
 
-            foreach (var result in filteredResults)
+            foreach (var result in filteredResults) //Filtra os resultados no expando
             {
                 var expando = new Dictionary<string, object>();
                 foreach (var field in requestedFields)
@@ -143,7 +143,7 @@ namespace AdHocTest.Reports
             return finalResultList;
         }
 
-        private class ResultRow
+        private class ResultRow     //Result row compõe as tabelas
         {
             public PlantSummary Main { get; set; }
             public CultivationSummary Related1 { get; set; }

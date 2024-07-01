@@ -96,7 +96,7 @@ public class OneOnOneReport
                 break;
         }
 
-        var predicate = "true"; // Initializing the predicate with a true condition
+        var predicate = "true"; // Predicado. Nele é construido o corpo da consulta
         var values = new List<object>();
         bool hasScientificName = false;
         bool hasCommonName = false;
@@ -121,7 +121,7 @@ public class OneOnOneReport
             var key = p.Split('=')[0];
             var value = p.Split('=')[1];
 
-            var plantType = queryable.ElementType.GetProperty("Plant").PropertyType; //MAIN TABLE  
+            var plantType = queryable.ElementType.GetProperty("Plant").PropertyType; //Main Table. Foi chamado de plant, mas podia ser qualquer outro nome
             var relatedType = queryable.ElementType.GetProperty("Related").PropertyType; //RELATED TABLE
 
             if (plantType.GetProperty(key) != null) //O que estou tentando filtrar está aonde?

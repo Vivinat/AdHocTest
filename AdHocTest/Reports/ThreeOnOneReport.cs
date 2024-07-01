@@ -19,15 +19,15 @@ namespace AdHocTest.Reports
             var parts = query.Split(':');
             if (parts.Length < 5)
             {
-                throw new ArgumentException("Query format is incorrect. Expected format: mainTable:relatedTable1:relatedTable2:relatedTable3:parameters");
+                throw new ArgumentException("Formato incorreto");
             }
 
-            var mainTable = parts[0];
+            var mainTable = parts[0];   //Separa a query string
             var relatedTable1 = parts[1];
             var relatedTable2 = parts[2];
             var relatedTable3 = parts[3];
             var parameters = parts[4].Split(';').ToList();
-
+            //Quero todas as tabelas
             IQueryable<ResultRow> queryable = _context.plant
                 .Join(_context.cultivation, p => p.scientific_name, c => c.scientific_name, (p, c) => new ResultRow { Main = p, Related1 = c })
                 .Join(_context.plant_details, pc => pc.Main.scientific_name, pd => pd.scientific_name, (pc, pd) => new ResultRow { Main = pc.Main, Related1 = pc.Related1, Related2 = pd })
@@ -64,16 +64,16 @@ namespace AdHocTest.Reports
                 var key = keyValue[0];
                 var value = keyValue[1];
 
-                var mainProp = typeof(PlantSummary).GetProperty(key);
-                var related1Prop = typeof(CultivationSummary).GetProperty(key);
+                var mainProp = typeof(PlantSummary).GetProperty(key);   //Usa reflection. O parametro que quero pertence a qual classe?  
+                var related1Prop = typeof(CultivationSummary).GetProperty(key); //em caso positivo, a var deixa de ser null
                 var related2Prop = typeof(PlantDetailsSummary).GetProperty(key);
                 var related3Prop = typeof(DangerousPlantsSummary).GetProperty(key);
 
-                if (mainProp != null)
+                if (mainProp != null)       
                 {
                     predicate += $" AND Main.{key} == @{values.Count}";
                 }
-                else if (related1Prop != null)
+                else if (related1Prop != null)  
                 {
                     predicate += $" AND Related1.{key} == @{values.Count}";
                 }
@@ -108,7 +108,7 @@ namespace AdHocTest.Reports
                 }
             }
 
-            var filteredResults = resultList.AsQueryable().Where(predicate, values.ToArray()).ToList();
+            var filteredResults = resultList.AsQueryable().Where(predicate, values.ToArray()).ToList(); //Aplica where
 
             var requestedFields = parameters.Select(p => p.Split('=')[0]).ToList();
             if (hasScientificName)
@@ -122,7 +122,7 @@ namespace AdHocTest.Reports
 
             var finalResultList = new List<IDictionary<string, object>>();
 
-            foreach (var result in filteredResults)
+            foreach (var result in filteredResults) //Para meu expando também preciso saber de qual classe pertence
             {
                 var expando = new Dictionary<string, object>();
                 foreach (var field in requestedFields)
@@ -155,7 +155,7 @@ namespace AdHocTest.Reports
             return finalResultList;
         }
 
-        private class ResultRow
+        private class ResultRow     //Result row é um objeto que possui todas as tabelas unidas
         {
             public PlantSummary Main { get; set; }
             public CultivationSummary Related1 { get; set; }

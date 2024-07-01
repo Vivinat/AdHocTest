@@ -14,7 +14,7 @@ public class OneReport
         _context = context;
     }
 
-    public async Task<List<dynamic>> GenerateReportAsync(string query)
+    public async Task<List<dynamic>> GenerateReportAsync(string query)  //Trata a query string
     {
         var parts = query.Split(':');
         var mainTable = parts[0];
@@ -22,7 +22,7 @@ public class OneReport
 
         IQueryable<dynamic> queryable = null;
 
-        switch (mainTable.ToLower())
+        switch (mainTable.ToLower())            //Qual a minha tabela principal?
         {
             case "cultivation":
                 queryable = _context.cultivation;
@@ -38,12 +38,12 @@ public class OneReport
                 break;
         }
 
-        var predicate = "true";
+        var predicate = "true";             //Prepara o predicado. Ele é o corpo da consulta
         var values = new List<object>();
         bool hasScientificName = false;
         bool hasCommonName = false;
 
-        if (parameters.Contains("@scientific_name"))
+        if (parameters.Contains("@scientific_name"))        //Scientific_name e common_name devem ser tratados de outra maneira por que nao envolvem comparações
         {
             hasScientificName = true;
             parameters = parameters.Where(p => !p.StartsWith("@scientific_name")).ToArray();
@@ -58,15 +58,15 @@ public class OneReport
 
         foreach (var parameter in parameters)
         {
-            var key = parameter.Split('=')[0];
-            var value = parameter.Split('=')[1];
+            var key = parameter.Split('=')[0];          //O nome do parametro
+            var value = parameter.Split('=')[1];        //O valor que quero para este parametro
 
             if (!string.IsNullOrEmpty(predicate))
             {
                 predicate += " && ";
             }
 
-            if (key.Equals("growth_rate", StringComparison.OrdinalIgnoreCase))
+            if (key.Equals("growth_rate", StringComparison.OrdinalIgnoreCase))      //Tratamentos de Enums
             {
                 values.Add(Enum.Parse(typeof(Growth_Rate), value, true));
                 predicate += $"{key} == @{values.Count - 1}";
@@ -83,12 +83,12 @@ public class OneReport
             }
         }
 
-        queryable = queryable.Where(predicate, values.ToArray());
+        queryable = queryable.Where(predicate, values.ToArray());          //Faz a consulta usando o metodo WHere 
 
         var requestedFields = parameters.Select(p => p.Split('=')[0]).ToList();
         if (hasScientificName)
         {
-            if (requestedFields.Count == 0)
+            if (requestedFields.Count == 0)             //Insere scientific_name caso tenha sido requisitado
             {
                 requestedFields.Add("scientific_name");
             }
@@ -97,7 +97,7 @@ public class OneReport
                 requestedFields.Insert(0, "scientific_name");
             }
         }
-        if (hasCommonName)
+        if (hasCommonName)          //Insere common_name caso tenha sido requisitado
         {
             if (requestedFields.Count == 0)
             {
@@ -109,14 +109,14 @@ public class OneReport
             }
         }
 
-        var queryResults = await queryable.ToListAsync();
+        var queryResults = await queryable.ToListAsync();       //Objeto expando recebe os resultados da query
 
         var resultList = new List<dynamic>();
 
         foreach (var result in queryResults)
         {
             var expando = new System.Dynamic.ExpandoObject() as IDictionary<string, Object>;
-            foreach (var field in requestedFields)
+            foreach (var field in requestedFields)      //Basicamente um dicionario de valores
             {
                 var prop = result.GetType().GetProperty(field);
                 expando.Add(field, prop.GetValue(result));
